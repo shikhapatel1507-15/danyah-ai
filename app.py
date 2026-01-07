@@ -8,6 +8,7 @@ app = FastAPI()
 
 @app.post("/personalize")
 async def personalize(request: Request):
+    # Force read JSON body
     user = await request.json()
 
     user = assign_identity(user)
@@ -16,8 +17,8 @@ async def personalize(request: Request):
     bundle = build_bundle(ranked[0])
 
     return {
-        "identity": user["identity"],
-        "hero_text": user["hero_text"],
+        "identity": user.get("identity"),
+        "hero_text": user.get("hero_text"),
         "recommended_products": ranked[:6],
         "bundle": bundle
     }
