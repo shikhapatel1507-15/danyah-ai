@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from identity import assign_identity
 from ranking import rank_products
 from bundles import build_bundle
@@ -6,10 +6,9 @@ from shopify import fetch_products
 
 app = FastAPI()
 
-from fastapi import Body
-
 @app.post("/personalize")
-def personalize(user: dict = Body(...)):
+async def personalize(request: Request):
+    user = await request.json()
 
     user = assign_identity(user)
     products = fetch_products()
