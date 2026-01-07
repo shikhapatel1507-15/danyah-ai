@@ -6,8 +6,11 @@ from shopify import fetch_products
 
 app = FastAPI()
 
+from fastapi import Body
+
 @app.post("/personalize")
-def personalize(user):
+def personalize(user: dict = Body(...)):
+
     user = assign_identity(user)
     products = fetch_products()
     ranked = rank_products(products, user)
