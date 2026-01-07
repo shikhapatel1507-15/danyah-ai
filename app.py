@@ -8,9 +8,22 @@ app = FastAPI()
 
 @app.post("/personalize")
 async def personalize(request: Request):
-    # Force read JSON body
-    user = await request.json()
+    # Always read JSON body safely
+    try:
+        user = await request.json()
+    except Exception:
+        user = {}
 
+    # If user is not a dictionary, fix it
+    if not isinstance(user, dict):
+        user = {}
+
+    # Ensure required keys exist
+    user.setdefault("pages", [])
+    user.setdefault("time_on_site", 0)
+    user.setdefault("region", "US")
+
+    # Run AI logic
     user = assign_identity(user)
     products = fetch_products()
     ranked = rank_products(products, user)
