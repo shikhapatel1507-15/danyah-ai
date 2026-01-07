@@ -6,6 +6,12 @@ from shopify import fetch_products
 
 app = FastAPI()
 
+# Health check route to verify Railway is running THIS file
+@app.get("/health")
+def health():
+    return {"status": "THIS IS THE NEW CODE"}
+
+# Main AI personalization endpoint
 @app.post("/personalize")
 async def personalize(request: Request):
     # Always read JSON body safely
@@ -27,6 +33,17 @@ async def personalize(request: Request):
     user = assign_identity(user)
     products = fetch_products()
     ranked = rank_products(products, user)
+
+    # Safety: handle empty product list
+    if not ranked:
+        return {
+            "identity": user.get("identity"),
+            "hero_text": user.get("hero_text"),
+            "recommended_products": [],
+            "bundle": None,
+            "message": "No products found"
+        }
+
     bundle = build_bundle(ranked[0])
 
     return {
